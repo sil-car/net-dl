@@ -9,16 +9,16 @@ from pathlib import Path
 from . import config
 
 
-class Props():
+class Props:
     def __init__(self, uri=None):
-        self.path = None
         self.size = None
         self.md5 = None
+        self.path = None
         if uri is not None:
             self.path = uri
 
 
-class FileProps(Props):
+class LocalFile(Props):
     def __init__(self, f=None):
         super().__init__(f)
         if f:
@@ -26,6 +26,9 @@ class FileProps(Props):
             if self.path.is_file():
                 self.get_size()
                 # self.get_md5()
+
+    def __str__(self):
+        return str(self.path)
 
     def get_size(self):
         if self.path is None:
@@ -60,30 +63,37 @@ class FileProps(Props):
         utime(self.path, (timestamp, timestamp))
 
 
-class UrlProps(Props):
-    def __init__(self, url=None, req_headers=None):
+class Url(Props):
+    def __init__(
+        self,
+        url=None,
+        request_headers=None,
+        timeout=config.HTTP_TIMEOUT
+    ):
         super().__init__(url)
-        self.req_headers = {}
-        if req_headers:
-            self.req_headers = req_headers
-        self.headers = None
-        if url is not None:
-            self.get_headers()
-            self.get_size()
-            self.get_md5()
+        self.request_headers = {}
+        if request_headers:
+            self.request_headers = request_headers
+        self.timeout = timeout
+        self.head_response = None
+        self.final_url = None
+        self.size = None
+        self.md5 = None
+        self.is_file = None
 
-    def get_headers(self):
-        if self.path is None:
-            self.headers = None
+    def __str__(self):
+        return self.path
+
+    def get_head_response(self):
         logging.debug(f"Getting headers from {self.path}.")
         try:
             # Force non-compressed txfr
-            self.req_headers['Accept-Encoding'] = 'identity'
+            self.request_headers['Accept-Encoding'] = 'identity'
             r = requests.head(
                 self.path,
                 allow_redirects=True,
-                headers=self.req_headers,
-                timeout=config.HTTP_TIMEOUT,
+                headers=self.request_headers,
+                timeout=self.timeout,
             )
         except config.HTTP_ERRORS as e:
             if isinstance(e, requests.exceptions.ConnectionError):
@@ -91,16 +101,20 @@ class UrlProps(Props):
             else:
                 logging.error(f"{type(e)}: {e}")
             return
-        self.headers = r.headers
-        return self.headers
+        self._set_is_file(r.headers)
+        self.head_response = r
+        self.final_url = r.url
+        self.size = self.get_size()
+        self.md5 = self.get_md5()
+        return self.head_response
 
     def get_size(self):
-        if self.headers is None:
-            r = self.get_headers()
+        if self.head_response is None:
+            r = self.get_head_response()
             if r is None:
                 return
-        content_length = self.headers.get('Content-Length')
-        content_encoding = self.headers.get('Content-Encoding')
+        content_length = self.head_response.headers.get('Content-Length')
+        content_encoding = self.head_response.headers.get('Content-Encoding')
         if content_encoding is not None:
             logging.critical(f"The server requires receiving the file compressed as '{content_encoding}'.")  # noqa: E501
         logging.debug(f"{content_length=}")
@@ -110,11 +124,11 @@ class UrlProps(Props):
 
     def get_md5(self):
         content_md5 = None
-        if self.headers is None:
-            r = self.get_headers()
+        if self.head_response is None:
+            r = self.get_head_response()
             if r is None:
                 return
-        if self.headers.get('server') == 'AmazonS3':
+        if self.head_response.headers.get('server') == 'AmazonS3':
             # Ref:
             # https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html  # noqa: E501
             # https://teppen.io/2018/06/23/aws_s3_etags/
@@ -123,17 +137,29 @@ class UrlProps(Props):
             # file. There's a way to generate a local equivalent etag, but that
             # also seems unrealistic:
             # https://teppen.io/2018/10/23/aws_s3_verify_etags/
-            if '-' not in self.headers.get('etag'):
-                content_md5 = self.headers.get('etag')
+            if '-' not in self.head_response.headers.get('etag'):
+                content_md5 = self.head_response.headers.get('etag')
             if content_md5:
                 # Convert from hex to base64
                 content_md5_hex = content_md5.strip('"').strip("'")
                 content_md5 = b64encode(bytes.fromhex(content_md5_hex)).decode()  # noqa: E501
         else:
-            content_md5 = self.headers.get('Content-MD5')
+            content_md5 = self.head_response.headers.get('Content-MD5')
         if content_md5 is not None:
             content_md5 = content_md5.strip('"').strip("'")
         logging.debug(f"{content_md5=}")
         if content_md5 is not None:
             self.md5 = content_md5
         return self.md5
+
+    def _set_is_file(self, response_headers):
+        ''' Defaults to None '''
+        # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type  # noqa: E501
+        content_type = response_headers.get('Content-Type')
+        content_type_parts = [p.strip() for p in content_type.split(';')]
+        mime_type = content_type_parts[0]
+        mime_main = mime_type.split('/')[0]
+        if mime_main == 'application':
+            self.is_file = True
+        elif mime_main == 'text':
+            self.is_file = False

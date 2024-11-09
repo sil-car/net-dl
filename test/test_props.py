@@ -14,12 +14,12 @@ class TestProps(unittest.TestCase):
         assert self.p.path == __file__
 
 
-class TestFileProps(unittest.TestCase):
+class TestLocalFile(unittest.TestCase):
     def setUp(self):
         self.f = Path('./test.txt')
         self.f_text = "test file text\n"
         self.f.write_text(self.f_text)
-        self.p = src.net_get.props.FileProps(str(self.f))
+        self.p = src.net_get.props.LocalFile(str(self.f))
 
     def test_path(self):
         assert isinstance(self.p.path, Path)
@@ -40,16 +40,17 @@ class TestFileProps(unittest.TestCase):
         self.f.unlink()
 
 
-class TestUrlProps(unittest.TestCase):
+class TestUrl(unittest.TestCase):
     def setUp(self):
         self.url = 'https://ip.me'
+        self.p = src.net_get.props.Url(self.url)
         # NOTE: This will make a connection to the URL and be a bit slow.
-        self.p = src.net_get.props.UrlProps(self.url)
+        self.p.get_head_response()
 
     def test_init(self):
         assert isinstance(
-            self.p.headers,
+            self.p.head_response.headers,
             requests.structures.CaseInsensitiveDict
         )
-        assert self.p.headers.get('Content-Type') == 'text/plain; charset=utf-8'  # noqa: E501
+        assert self.p.head_response.headers.get('Content-Type') == 'text/plain; charset=utf-8'  # noqa: E501
         # TODO: Pick a different link to test MD5?
