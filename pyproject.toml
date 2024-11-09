@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "net_get"
+dependencies = [
+    "requests",
+]
+dynamic = ["readme", "version"]
+
+[project.scripts]
+net-get = "net_get:main"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"]}
+version = {attr = "net_get.__version__"}
