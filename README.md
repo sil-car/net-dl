@@ -7,7 +7,7 @@ CLI command, or as a python module.
 
 ```
 python3 -m pip install pipx
-# TODO: Update this to a release link.
+# TODO: Publish on PyPI
 pipx install https://gitlab.com/n8marti/net-get/-/archive/master/net-get-master.zip
 ```
 
