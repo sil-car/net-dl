@@ -67,7 +67,7 @@ def main():
     for hstr in args.header:
         k, v = hstr.split(':')
         headers[k.strip()] = v.strip()
-    Download(
+    return Download(
         url=args.url,
         destdir=destdir,
         destname=destname,

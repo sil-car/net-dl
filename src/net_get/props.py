@@ -86,21 +86,28 @@ class Url(Props):
 
     def get_head_response(self):
         logging.debug(f"Getting headers from {self.path}.")
+        self.request_headers['Accept-Encoding'] = 'identity'
         try:
             # Force non-compressed txfr
-            self.request_headers['Accept-Encoding'] = 'identity'
             r = requests.head(
                 self.path,
                 allow_redirects=True,
                 headers=self.request_headers,
                 timeout=self.timeout,
             )
-        except config.HTTP_ERRORS as e:
-            if isinstance(e, requests.exceptions.ConnectionError):
-                logging.error(e)
+        except requests.exceptions.ConnectionError as e:
+            if 'Failed to resolve' in str(e):
+                logging.error(f"Failed to resolve address: {self.path}")
             else:
-                logging.error(f"{type(e)}: {e}")
+                logging.error(f"ConnectionError: {e}")
             return
+        except config.HTTP_ERRORS as e:
+            logging.error(f"{type(e)}: {e}")
+            return
+        except Exception as e:
+            logging.error(f"{type(e)}: {e}")
+            return
+
         self._set_is_file(r.headers)
         self.head_response = r
         self.final_url = r.url

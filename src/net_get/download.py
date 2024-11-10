@@ -49,10 +49,22 @@ class Download:
 
     def get(self):
         self.url.get_head_response()
+        r = self.url.head_response
+        if r is None:
+            return 1
+        if r.status_code != 200:
+            if r.status_code == 404:
+                logging.error(f"{r.status_code}: {r.reason}")
+                return 1
+            else:
+                logging.debug(self.url.head_response.__dict__)
+                logging.error(f"{r.status_code}: {r.reason}")
+                return 1
         if self.url.is_file:
             self.get_file()
         else:
             self.get_text()
+        return 0
 
     def get_content(self):
         return self._get_completed_request_obj()._content
@@ -61,7 +73,7 @@ class Download:
         ''' Content-Type is "text", return decoded text. '''
         r = self._get_completed_request_obj()
         if r:
-            return r.text
+            print(r.text)
 
     def get_file(self, file_mode='wb'):
         ''' Content-Type is "application", show progress and save to file. '''
