@@ -22,19 +22,19 @@ class TestLocalFile(unittest.TestCase):
         self.p = src.net_get.props.LocalFile(str(self.f))
 
     def test_path(self):
-        assert isinstance(self.p.path, Path)
-        assert len(f"{self.p.path}") > 0
-        assert f"{self.p.path}" == f"{self.f}"
+        self.assertTrue(isinstance(self.p.path, Path))
+        self.assertGreater(len(f"{self.p.path}"), 0)
+        self.assertEqual(f"{self.p.path}", f"{self.f}")
 
     def test_size(self):
-        assert self.p.size is not None
-        assert self.p.size == len(self.f_text)
+        self.assertIsNotNone(self.p.size)
+        self.assertEqual(self.p.size, len(self.f_text))
 
     def test_mtime(self):
         old = self.p.get_mtime()
-        assert old
+        self.assertIsNotNone(old)
         self.p.set_mtime('Wed, 21 Oct 2015 07:28:00 GMT')
-        assert old != self.p.get_mtime()
+        self.assertNotEqual(old, self.p.get_mtime())
 
     def tearDown(self):
         self.f.unlink()
@@ -48,9 +48,14 @@ class TestUrl(unittest.TestCase):
         self.p.get_head_response()
 
     def test_init(self):
-        assert isinstance(
-            self.p.head_response.headers,
-            requests.structures.CaseInsensitiveDict
+        self.assertTrue(
+            isinstance(
+                self.p.head_response.headers,
+                requests.structures.CaseInsensitiveDict
+            )
         )
-        assert self.p.head_response.headers.get('Content-Type') == 'text/plain; charset=utf-8'  # noqa: E501
+        self.assertEqual(
+            self.p.head_response.headers.get('Content-Type'),
+            'text/plain; charset=utf-8'
+        )
         # TODO: Pick a different link to test MD5?
