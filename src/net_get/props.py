@@ -86,6 +86,9 @@ class Url(Props):
 
     def get_head_response(self):
         logging.debug(f"Getting headers from {self.path}.")
+        # NOTE: Adding 'identity' encoding to header so that content will be
+        # uncompressed, which allows for correct progress measurement. However,
+        # this may cause problems with some types of content.
         self.request_headers['Accept-Encoding'] = 'identity'
         try:
             # Force non-compressed txfr
@@ -108,6 +111,7 @@ class Url(Props):
             logging.error(f"{type(e)}: {e}")
             return
 
+        logging.debug(f"head_response headers:{r.headers}")
         self._set_is_file(r.headers)
         self.head_response = r
         self.final_url = r.url
@@ -160,13 +164,22 @@ class Url(Props):
         return self.md5
 
     def _set_is_file(self, response_headers):
-        ''' Defaults to None '''
-        # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type  # noqa: E501
+        ''' Determines whether the URL's content is a file or not.
+        True: content is downloaded and saved as a local file
+        False|None: content is printed to stdout
+        '''
+        # https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
         content_type = response_headers.get('Content-Type')
+        logging.debug(f"{content_type=}")
         content_type_parts = [p.strip() for p in content_type.split(';')]
-        mime_type = content_type_parts[0]
-        mime_main = mime_type.split('/')[0]
-        if mime_main == 'application':
-            self.is_file = True
-        elif mime_main == 'text':
+        mime = content_type_parts[0]
+        mime_type, mime_subtype = mime.split('/')
+        if mime_type == 'text':
             self.is_file = False
+        elif mime_type == 'application' and mime_subtype in ['json', 'xml']:
+            self.is_file = False
+        else:
+            # NOTE: Some types will likely not be handled correctly with a
+            # simple "is file or not" property, but hopefully this handles most
+            # cases.
+            self.is_file = True
