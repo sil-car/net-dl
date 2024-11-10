@@ -23,3 +23,20 @@ class TestDownload(unittest.TestCase):
             d = download.Download(url1)
             self.assertEqual(d.get(), 0)
             self.assertEqual(d.url.final_url, url2)
+
+    def test_is_file(self):
+        urls = {
+            'https://httpbin.org/html': False,
+            'https://httpbin.org/image/svg': True,
+            'https://httpbin.org/json': False,
+            'https://httpbin.org/robots.txt': False,
+            'https://httpbin.org/xml': False,
+        }
+        for url, result in urls.items():
+            dl = download.Download(url)
+            dl.url.get_head_response()
+            self.assertIs(
+                dl.url.is_file,
+                result,
+                f"{url}: {result}; {dl.url.is_file}"
+            )
