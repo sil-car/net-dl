@@ -36,6 +36,10 @@ def main():
         help=f"set server timeout in seconds [default={config.HTTP_TIMEOUT}]",
     )
     parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help="verbose output",
+    )
+    parser.add_argument(
         '--debug', action='store_true', help=argparse.SUPPRESS,
     )
 
@@ -44,7 +48,9 @@ def main():
     resume = False
 
     # Set up logging.
-    log_level = logging.INFO
+    log_level = logging.WARNING
+    if args.verbose:
+        log_level = logging.INFO
     if args.debug:
         log_level = logging.DEBUG
     logging.basicConfig(

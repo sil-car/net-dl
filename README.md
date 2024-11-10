@@ -15,18 +15,52 @@ pipx install https://gitlab.com/n8marti/net-get/-/archive/master/net-get-master.
 
 ### CLI command
 ```
-~$ net-get 'https://ip.me'
-2024-11-09 12:09:00 INFO: File size on server [B]: 14
-2024-11-09 12:09:00 INFO: Starting new download from: https://ip.me.
-2024-11-09 12:09:00 INFO: 14 B needed; 80052760576 B available
- [..................................................................] 100.0%
-2024-11-09 12:09:02 INFO: File saved as: /home/user/net_get-20241109T120900
-# TODO: Also show example with link to actual file.
+~$ # print content to stdout if text/html/json/xml
+~$ net-get 'https://httpbin.org/json'
+{
+  "slideshow": {
+    "author": "Yours Truly", 
+    "date": "date of publication", 
+    "slides": [
+      {
+        "title": "Wake up to WonderWidgets!", 
+        "type": "all"
+      }, 
+      {
+        "items": [
+          "Why <em>WonderWidgets</em> are great", 
+          "Who <em>buys</em> WonderWidgets"
+        ], 
+        "title": "Overview", 
+        "type": "all"
+      }
+    ], 
+    "title": "Sample Slide Show"
+  }
+}
+
+~$ # save content to disk if file
+~$ net-get 'https://httpbin.org/image/svg'
+ [...................................                                     ]  50%
 ```
 
 ### Python module
 
-TODO
+```python
+>>> import net_get
+>>> url = 'https://httpbin.org/image/svg'
+>>> dl = net_get.Download(url)
+>>> dl.get()
+ [........................................................................] 100%
+0
+>>> import logging
+>>> l = logging.get_logger()
+>>> l.setLevel(logging.INFO)
+>>> dl.get()
+INFO:root:File already exists: /home/nate/g/net-get/svg
+0
+>>>
+```
 
 # TODO list
 
