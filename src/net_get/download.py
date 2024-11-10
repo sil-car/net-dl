@@ -21,7 +21,7 @@ class Download:
         destdir=getcwd(),
         destname=None,
         request_headers=None,
-        chunk_size=100*1024,
+        chunk_size=None,
         progress_queue=queue.Queue(),
         remove_on_error=True,
         resume=None,
@@ -60,6 +60,9 @@ class Download:
                 logging.debug(self.url.head_response.__dict__)
                 logging.error(f"{r.status_code}: {r.reason}")
                 return 1
+        if self.chunk_size is None:
+            # Ensure at least 2 chunks so that progress queue doesn't hang.
+            self.chunk_size = min(round(self.url.size / 2), 100*1024)
         if self.url.is_file:
             self.get_file()
         else:
