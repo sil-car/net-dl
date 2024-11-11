@@ -63,7 +63,7 @@ INFO:root:File already exists: /home/nate/g/net-get/svg
 >>>
 ```
 **External progress bar**  
-app.py:
+`demo/tkapp.py`:
 ```python
 from net_get import Download
 from queue import Queue
@@ -119,26 +119,8 @@ def run():
 ```
 Run code:
 ```
-python -c 'import app; app.run()'
+demo$ python -c 'import tkapp; tkapp.run()'
 ```
 ||
 |:-:|
 |![](demo/tkapp.mp4)|
-
-
-# TODO list
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
