@@ -1,13 +1,12 @@
 import argparse
 import logging
-import sys
 from pathlib import Path
 from os import getcwd
 
 from . import config
 from .download import Download
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 def main():
@@ -41,8 +40,7 @@ def main():
         help="verbose output",
     )
     parser.add_argument(
-        '--version', action='store_true',
-        help="show version number",
+        '--version', action='version', version=f'%(prog)s {__version__}'
     )
     parser.add_argument(
         '--debug', action='store_true', help=argparse.SUPPRESS,
@@ -51,10 +49,6 @@ def main():
     args = parser.parse_args()
     destdir = getcwd()
     resume = False
-
-    if args.version:
-        print(f"{parser.prog} {__version__}")
-        sys.exit()
 
     # Set up logging.
     log_level = logging.WARNING

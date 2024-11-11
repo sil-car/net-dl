@@ -57,7 +57,7 @@ python3 -m pip install net-dl
 ```python
 >>> import net_dl
 >>> url = 'https://httpbin.org/image/svg'
->>> dl = net_get.Download(url)
+>>> dl = net_dl.Download(url)
 >>> dl.get()
  [........................................................................] 100%
 0
