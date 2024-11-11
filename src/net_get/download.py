@@ -1,5 +1,4 @@
 import logging
-import queue
 import re
 import requests
 import shutil
@@ -7,6 +6,8 @@ import sys
 import threading
 from os import getcwd
 from pathlib import Path
+from queue import Queue
+from time import sleep
 from urllib.parse import unquote
 
 from . import config
@@ -22,13 +23,13 @@ class Download:
         destname=None,
         request_headers=None,
         chunk_size=None,
-        progress_queue=queue.Queue(),
+        progress_queue=None,
         remove_on_error=True,
         resume=None,
         timeout=config.HTTP_TIMEOUT,
         callback=None,
-        callback_args=None,
-        callback_kwargs=None,
+        callback_args=list(),
+        callback_kwargs=dict(),
     ):
         self.url = Url(url)
         self.is_file = None
@@ -80,6 +81,13 @@ class Download:
 
     def get_file(self, file_mode='wb'):
         ''' Content-Type is "application", show progress and save to file. '''
+
+        # Determine progress queue.
+        if self.progress_queue is None:
+            use_own_queue = True
+            self.progress_queue = Queue()
+        else:
+            use_own_queue = False
 
         # Determine output filename.
         cd_str = self.url.head_response.headers.get('Content-Disposition')
@@ -143,13 +151,17 @@ class Download:
         t.start()
         # Show download progress.
         while t.is_alive():
-            p = self.progress_queue.get()
-            self._write_progress_bar(p)
-            if p == 100:
-                break
+            if use_own_queue:
+                p = self.progress_queue.get()
+                self._write_progress_bar(p)
+                if p == 100:
+                    break
+            else:
+                sleep(0.1)
 
-        if sys.stdout.isatty():
+        if use_own_queue and sys.stdout.isatty():
             print()  # newline after progress bar is done
+
         if not self._check_integrity():
             logging.critical("Integrity check failed. Please try again.")
             sys.exit(1)
