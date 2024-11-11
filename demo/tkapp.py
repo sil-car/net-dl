@@ -1,4 +1,4 @@
-from net_get import Download
+from net_dl import Download
 from queue import Queue
 from threading import Thread
 from tkinter import IntVar
@@ -11,7 +11,7 @@ class Win(ttk.Frame):
     def __init__(self, root):
         super().__init__(root)
         self.root = root
-        self.root.title("Net Get Demo")
+        self.root.title("net-dl demo")
 
         self.urlv = StringVar()
         self.urlw = ttk.Entry(self, textvariable=self.urlv)

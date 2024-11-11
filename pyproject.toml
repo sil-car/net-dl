@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "net_get"
+name = "net-dl"
 description = "Download web pages and files from the internet using CLI or as a Python module."
 readme = "README.md"
 authors = [
@@ -21,11 +21,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://gitlab.com/n8marti/net-get"
-Issues = "https://gitlab.com/n8marti/net-get/-/issues"
+Homepage = "https://gitlab.com/n8marti/net-dl"
+Issues = "https://gitlab.com/n8marti/net-dl/-/issues"
 
 [project.scripts]
-net-get = "net_get:main"
+net-dl = "net_dl:main"
 
 [tool.setuptools.dynamic]
-version = {attr = "net_get.__version__"}
+version = {attr = "net_dl.__version__"}

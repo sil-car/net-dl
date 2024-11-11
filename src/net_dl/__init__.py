@@ -6,11 +6,11 @@ from os import getcwd
 from . import config
 from .download import Download
 
-__version__ = '0.1.4'
+__version__ = '0.1.0'
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="net-get")
+    parser = argparse.ArgumentParser(prog="net-dl")
     parser.add_argument(
         'url', metavar='URL', type=str,
         help="source URL(s) to download from",
