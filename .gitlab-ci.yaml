@@ -1,0 +1,36 @@
+image: python
+
+stages:
+  - build
+  - test
+  - publish
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+cache:
+  paths:
+    - .pip-cache/
+
+before_script:
+  - python --version
+  - python -m pip install --upgrade pip build twine
+
+build:
+  stage: build
+  script:
+    - python -m build
+  artifacts:
+    paths:
+      - dist/
+
+test:
+  stage: test
+  script:
+    - pip install dist/*.whl
+    - python -m unittest -b
+
+publish:
+  stage: publish
+  script:
+    - TWINE_PASSWORD="$PYPI_TEST_TOKEN" TWINE_USERNAME=__token__ python -m twine upload dist/*
