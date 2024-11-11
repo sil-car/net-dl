@@ -3,7 +3,8 @@ image: python:3
 stages:
   - build
   - test
-  - publish
+  - publish-test
+  - publish-live
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
@@ -13,6 +14,9 @@ cache:
     - .pip-cache/
 
 before_script:
+  # Install system dependencies
+  - apt-get update && apt-get install -y jq
+  # Install python dependencies
   - python --version
   - python -m pip install --upgrade pip build twine id
 
@@ -31,23 +35,37 @@ test:
     - python -m unittest -b
     - python -m twine check dist/*
 
-publish:
-  stage: publish
+publish-test:
+  stage: publish-test
   id_tokens:
     PYPI_ID_TOKEN:
-      # aud: testpypi
+      aud: testpypi
+  script:
+    # Retrieve the OIDC token from GitLab CI/CD, and exchange it for a PyPI API token
+    - oidc_token=$(python -m id PYPI)
+    - echo "OIDC token length = ${#oidc_token}"
+    - resp=$(curl -X POST "https://test.pypi.org/_/oidc/mint-token" -d "{\"token\":\"${oidc_token}\"}")
+    - api_token=$(jq --raw-output '.token' <<< "${resp}")
+    - echo "API token length = ${#api_token}"
+    # Upload to TestPyPI authenticating via the newly-minted token
+    - TWINE_USERNAME=__token__ TWINE_PASSWORD="$api_token" twine upload --verbose --repository testpypi dist/*
+  rules:
+    - if: $CI_COMMIT_TAG
+
+
+publish-live:
+  stage: publish-live
+  id_tokens:
+    PYPI_ID_TOKEN:
       aud: pypi
   script:
-    # Install dependencies
-    - apt-get update && apt-get install -y jq
     # Retrieve the OIDC token from GitLab CI/CD, and exchange it for a PyPI API token
-    # - server="https://test.pypi.org"
-    - server="https://pypi.org"
     - oidc_token=$(python -m id PYPI)
-    - resp=$(curl -X POST ${server}/_/oidc/mint-token -d "{\"token\":\"${oidc_token}\"}")
+    - echo "OIDC token length = ${#oidc_token}"
+    - resp=$(curl -X POST "https://pypi.org/_/oidc/mint-token" -d "{\"token\":\"${oidc_token}\"}")
     - api_token=$(jq --raw-output '.token' <<< "${resp}")
+    - echo "API token length = ${#api_token}"
     # Upload to PyPI authenticating via the newly-minted token
-    # - TWINE_USERNAME=__token__ TWINE_PASSWORD="$api_token" twine upload --verbose --repository testpypi dist/*
     - TWINE_USERNAME=__token__ TWINE_PASSWORD="$api_token" twine upload --verbose dist/*
   rules:
     - if: $CI_COMMIT_TAG

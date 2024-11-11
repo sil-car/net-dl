@@ -6,7 +6,7 @@ from os import getcwd
 from . import config
 from .download import Download
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 def main():
