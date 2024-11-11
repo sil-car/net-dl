@@ -1,18 +1,19 @@
 import argparse
 import logging
+import sys
 from pathlib import Path
 from os import getcwd
 
 from . import config
 from .download import Download
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 def main():
     parser = argparse.ArgumentParser(prog="net-dl")
     parser.add_argument(
-        'url', metavar='URL', type=str,
+        'url', metavar='URL', type=str, nargs='?',
         help="source URL(s) to download from",
     )
     parser.add_argument(
@@ -40,12 +41,20 @@ def main():
         help="verbose output",
     )
     parser.add_argument(
+        '--version', action='store_true',
+        help="show version number",
+    )
+    parser.add_argument(
         '--debug', action='store_true', help=argparse.SUPPRESS,
     )
 
     args = parser.parse_args()
     destdir = getcwd()
     resume = False
+
+    if args.version:
+        print(f"{parser.prog} {__version__}")
+        sys.exit()
 
     # Set up logging.
     log_level = logging.WARNING
