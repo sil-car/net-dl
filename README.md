@@ -131,3 +131,9 @@ demo$ python -c 'import tkapp; tkapp.run()'
 ||
 |:-:|
 |![](demo/tkapp.mp4)|
+
+
+## Releasing on PyPI
+
+- Create new tag in repo that matches package version; e.g. if version is "0.1.0", tag will be "v0.1.0".
+- CI will auto build and upload package to TestPyPI and PyPI.
