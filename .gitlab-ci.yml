@@ -45,6 +45,7 @@ publish-test:
     - oidc_token=$(python -m id PYPI)
     - echo "OIDC token length = ${#oidc_token}"
     - resp=$(curl -X POST "https://test.pypi.org/_/oidc/mint-token" -d "{\"token\":\"${oidc_token}\"}")
+    - echo "RESP length = ${#resp}"
     - api_token=$(jq --raw-output '.token' <<< "${resp}")
     - echo "API token length = ${#api_token}"
     # Upload to TestPyPI authenticating via the newly-minted token
@@ -63,6 +64,7 @@ publish-live:
     - oidc_token=$(python -m id PYPI)
     - echo "OIDC token length = ${#oidc_token}"
     - resp=$(curl -X POST "https://pypi.org/_/oidc/mint-token" -d "{\"token\":\"${oidc_token}\"}")
+    - echo "RESP length = ${#resp}"
     - api_token=$(jq --raw-output '.token' <<< "${resp}")
     - echo "API token length = ${#api_token}"
     # Upload to PyPI authenticating via the newly-minted token
