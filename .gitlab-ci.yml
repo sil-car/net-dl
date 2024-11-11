@@ -33,4 +33,4 @@ test:
 publish:
   stage: publish
   script:
-    - TWINE_PASSWORD="$PYPI_TEST_TOKEN" TWINE_USERNAME=__token__ python -m twine upload dist/*
+    - TWINE_PASSWORD="$PYPI_TEST_TOKEN" TWINE_USERNAME=__token__ python -m twine upload --repository testpypi dist/*
