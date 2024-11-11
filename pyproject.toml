@@ -4,10 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "net_get"
+authors = [
+    {name="Nate Marti", email="n8marti@gmail.com"}
+]
+requires-python = ">=3.8"
 dependencies = [
     "requests",
 ]
 dynamic = ["readme", "version"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/n8marti/net-get"
+Issues = "https://gitlab.com/n8marti/net-get/-/issues"
 
 [project.scripts]
 net-get = "net_get:main"
