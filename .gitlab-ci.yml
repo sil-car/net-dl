@@ -35,22 +35,19 @@ publish:
   stage: publish
   id_tokens:
     PYPI_ID_TOKEN:
-      aud: testpypi
-      # aud: pypi
+      # aud: testpypi
+      aud: pypi
   script:
-    # - TWINE_PASSWORD=$PYPI_TEST_TOKEN TWINE_USERNAME=__token__ python -m twine upload --verbose --repository testpypi dist/*
-    # - TWINE_PASSWORD=$PYPI_TOKEN TWINE_USERNAME=__token__ python -m twine upload dist/*
-
     # Install dependencies
     - apt-get update && apt-get install -y jq
     # Retrieve the OIDC token from GitLab CI/CD, and exchange it for a PyPI API token
-    - server="https://test.pypi.org"
-    # - server="https://pypi.org"
+    # - server="https://test.pypi.org"
+    - server="https://pypi.org"
     - oidc_token=$(python -m id PYPI)
     - resp=$(curl -X POST ${server}/_/oidc/mint-token -d "{\"token\":\"${oidc_token}\"}")
     - api_token=$(jq --raw-output '.token' <<< "${resp}")
     # Upload to PyPI authenticating via the newly-minted token
-    - twine upload --verbose --repository testpypi -u __token__ -p "$api_token" dist/*
-    # - twine upload -u __token__ -p "$api_token" dist/*
-  # rules:
-  #   - if: $CI_COMMIT_TAG
+    # - twine upload --verbose --repository testpypi -u __token__ -p "$api_token" dist/*
+    - twine upload -u __token__ -p "$api_token" dist/*
+  rules:
+    - if: $CI_COMMIT_TAG
