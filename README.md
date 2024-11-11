@@ -3,12 +3,19 @@
 Download web pages and files from the internet. Can be used as a standalone
 CLI command, or as a python module.
 
+[Project README](README.md)
+
 ## Installation
 
+**End Users (with pipx)**
 ```
 python3 -m pip install pipx
-# TODO: Publish on PyPI
-pipx install git+https://gitlab.com/n8marti/net-get.git
+pipx install net_get
+```
+
+**Dev Users (with pip)**
+```
+python3 -m pip install net_get
 ```
 
 ## Usage
