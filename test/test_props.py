@@ -2,12 +2,12 @@ import requests
 import unittest
 from pathlib import Path
 
-import src.net_get
+import src.net_dl
 
 
 class TestProps(unittest.TestCase):
     def setUp(self):
-        self.p = src.net_get.props.Props(__file__)
+        self.p = src.net_dl.props.Props(__file__)
 
     def test_uri(self):
         print(self.p.path)
@@ -19,7 +19,7 @@ class TestLocalFile(unittest.TestCase):
         self.f = Path('./test.txt')
         self.f_text = "test file text\n"
         self.f.write_text(self.f_text)
-        self.p = src.net_get.props.LocalFile(str(self.f))
+        self.p = src.net_dl.props.LocalFile(str(self.f))
 
     def test_path(self):
         self.assertTrue(isinstance(self.p.path, Path))
@@ -43,7 +43,7 @@ class TestLocalFile(unittest.TestCase):
 class TestUrl(unittest.TestCase):
     def setUp(self):
         self.url = 'https://ip.me'
-        self.p = src.net_get.props.Url(self.url)
+        self.p = src.net_dl.props.Url(self.url)
         # NOTE: This will make a connection to the URL and be a bit slow.
         self.p.get_head_response()
 

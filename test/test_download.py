@@ -1,6 +1,6 @@
 import unittest
 
-from src.net_get import download
+from src.net_dl import download
 
 
 class TestDownload(unittest.TestCase):
