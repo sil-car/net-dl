@@ -8,7 +8,7 @@ CLI command, or as a python module.
 ```
 python3 -m pip install pipx
 # TODO: Publish on PyPI
-pipx install https://gitlab.com/n8marti/net-get/-/archive/master/net-get-master.zip
+pipx install git+https://gitlab.com/n8marti/net-get.git
 ```
 
 ## Usage
