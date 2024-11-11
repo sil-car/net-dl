@@ -67,6 +67,7 @@ publish-live:
     - echo "RESP length = ${#resp}"
     - api_token=$(jq --raw-output '.token' <<< "${resp}")
     - echo "API token length = ${#api_token}"
+    - if [ ${#api_token} -lt 10 ]; then echo "$resp"; fi
     # Upload to PyPI authenticating via the newly-minted token
     - TWINE_USERNAME=__token__ TWINE_PASSWORD="$api_token" twine upload --verbose dist/*
   rules:
