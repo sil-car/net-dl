@@ -4,7 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "net_get"
-description = "Download web pages and files from the internet using CLI or as a Python module."
+#description = "Download web pages and files from the internet using CLI or as a Python module."
+readme = "README.md"
 authors = [
     {name="Nate Marti", email="n8marti@gmail.com"}
 ]
@@ -12,7 +13,7 @@ requires-python = ">=3.8"
 dependencies = [
     "requests",
 ]
-dynamic = ["readme", "version"]
+dynamic = ["version"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -27,5 +28,4 @@ Issues = "https://gitlab.com/n8marti/net-get/-/issues"
 net-get = "net_get:main"
 
 [tool.setuptools.dynamic]
-readme = {file = ["README.md"]}
 version = {attr = "net_get.__version__"}

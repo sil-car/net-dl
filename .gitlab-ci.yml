@@ -29,6 +29,7 @@ test:
   script:
     - pip install dist/*.whl
     - python -m unittest -b
+    - python -m twine check dist/*
 
 publish:
   stage: publish
