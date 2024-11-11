@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "net_get"
-#description = "Download web pages and files from the internet using CLI or as a Python module."
+description = "Download web pages and files from the internet using CLI or as a Python module."
 readme = "README.md"
 authors = [
     {name="Nate Marti", email="n8marti@gmail.com"}
