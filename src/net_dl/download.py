@@ -74,7 +74,7 @@ class Download:
         return self._get_completed_request_obj()._content
 
     def get_text(self):
-        ''' Content-Type is "text", return decoded text. '''
+        ''' Content-Type is "text", etc., return decoded text. '''
         r = self._get_completed_request_obj()
         if r:
             print(r.text)
@@ -106,8 +106,9 @@ class Download:
             logging.debug(f"Current downloaded size [B]: {local_size}")
             if (
                 self.resume
-                and local_size < self.remaining_size
+                and local_size < self.url.size
                 and self.url.head_response.headers.get('Accept-Ranges') == 'bytes'  # noqa: E501
+                and self._check_server_accepts_range()
             ):
                 logging.debug("Resuming download.")
                 file_mode = 'ab'
@@ -131,15 +132,16 @@ class Download:
 
         # Log download type.
         if 'Range' in self.request_headers.keys():
-            message = f"Continuing download from: {self.url.path}."
+            verb = "Continuing"
         else:
-            message = f"Starting new download from: {self.url.path}."
-        logging.info(message)
+            verb = "Starting new"
+        logging.info(f"{verb} download from: {self.url.path}")
 
         # Check for available disk space.
         if not self._check_disk_space():
             logging.critical("Not enough disk space.")
-            sys.exit(1)
+            # sys.exit(1)
+            return
 
         # Start download thread.
         t = threading.Thread(
@@ -152,10 +154,8 @@ class Download:
         # Show download progress.
         while t.is_alive():
             if use_own_queue:
-                p = self.progress_queue.get()
+                p = self.progress_queue.get(timeout=10)
                 self._write_progress_bar(p)
-                if p == 100:
-                    break
             else:
                 sleep(0.1)
         if use_own_queue and sys.stdout.isatty():
@@ -163,8 +163,18 @@ class Download:
 
         logging.info(f"File saved as: {self.dest.path}")
         if not self._check_integrity():
-            logging.critical(f"Integrity check failed")
+            logging.critical("Integrity check failed")
             sys.exit(1)
+
+    def _check_server_accepts_range(self):
+        accepts = False
+        request_headers = {'Range': 'bytes=0-1'}
+        url = Url(self.url.path, request_headers=request_headers)
+        r = url.get_head_response()
+        logging.debug(f"Accepts Range check: {r.status_code=}; {r.headers=}")
+        if r.status_code == 206 and 'Content-Range' in r.headers.keys():
+            accepts = True
+        return accepts
 
     def _check_disk_space(self):
         free = shutil.disk_usage(self.dest.path.parent).free
@@ -232,6 +242,10 @@ class Download:
         return fname.strip().strip('"')
 
     def _get_stream_request(self, file_mode='wb'):
+        logging.debug(f"Download._get_stream_request for: {self.url}")
+        logging.debug(f"{self.request_headers=}")
+        logging.debug(f"{self.chunk_size=}")
+        logging.debug(f"{self.timeout=}")
         try:
             with requests.get(
                 str(self.url),
@@ -240,17 +254,18 @@ class Download:
                 timeout=self.timeout,
                 allow_redirects=True,
             ) as r:
+                logging.debug(f"Response {r.headers=}")
                 with self.dest.path.open(mode=file_mode) as f:
                     if file_mode == 'wb':
                         verb = 'Writing'
-                    else:
+                    elif file_mode == 'ab':
                         verb = 'Appending'
                     logging.debug(f"{verb} data to file: {self.dest.path}")
                     for chunk in r.iter_content(chunk_size=self.chunk_size):
                         f.write(chunk)
                         # Send progress value to queue param.
                         local_size = self.dest.get_size()
-                        percent = round(local_size / self.remaining_size * 100)
+                        percent = round(local_size / self.url.size * 100)
                         self.progress_queue.put(percent)
                         if self.callback:
                             self.callback(

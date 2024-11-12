@@ -2,11 +2,13 @@ import argparse
 import logging
 from pathlib import Path
 from os import getcwd
+from sys import exit as sys_exit
+from sys import stderr
 
 from . import config
 from .download import Download
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 def main():
@@ -76,10 +78,14 @@ def main():
     for hstr in args.header:
         k, v = hstr.split(':')
         headers[k.strip()] = v.strip()
-    return Download(
-        url=args.url,
-        destdir=destdir,
-        destname=destname,
-        request_headers=headers,
-        resume=resume,
-    ).get()
+    try:
+        return Download(
+            url=args.url,
+            destdir=destdir,
+            destname=destname,
+            request_headers=headers,
+            resume=resume,
+        ).get()
+    except KeyboardInterrupt:
+        print("Cancelled with Ctrl+C", file=stderr)
+        sys_exit(1)

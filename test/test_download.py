@@ -25,12 +25,6 @@ class TestDownload(unittest.TestCase):
             self.assertEqual(d.get(), 0)
             self.assertEqual(d.url.final_url, url2)
 
-    # def test_check_integrity(self):
-    #     remote_svg = 'https://httpbin.org/image/svg'
-    #     destdir = Path(__file__).parent
-    #     local_svg = destdir / 'svg'
-    #     download.Download(remote_svg)
-
     def test_is_file(self):
         urls = {
             'https://httpbin.org/html': False,
