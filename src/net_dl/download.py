@@ -167,6 +167,7 @@ class Download:
             sys.exit(1)
 
     def _check_server_accepts_range(self):
+        # Ref: https://stackoverflow.com/a/50635525
         accepts = False
         request_headers = {'Range': 'bytes=0-1'}
         url = Url(self.url.path, request_headers=request_headers)
