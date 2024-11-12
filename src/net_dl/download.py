@@ -158,14 +158,13 @@ class Download:
                     break
             else:
                 sleep(0.1)
-
         if use_own_queue and sys.stdout.isatty():
             print()  # newline after progress bar is done
 
-        if not self._check_integrity():
-            logging.critical("Integrity check failed. Please try again.")
-            sys.exit(1)
         logging.info(f"File saved as: {self.dest.path}")
+        if not self._check_integrity():
+            logging.critical(f"Integrity check failed")
+            sys.exit(1)
 
     def _check_disk_space(self):
         free = shutil.disk_usage(self.dest.path.parent).free
@@ -174,18 +173,17 @@ class Download:
             return False
         return True
 
-    def _check_integrity(
-        self,
-        sum_type=None,
-    ):
+    def _check_integrity(self, sum_type=None):
         result = True
         if not self.dest.path.is_file():
             logging.error(f"File does not exist: {self.dest.path}")
             result = False
         if result and self.url.size:
             result = self.dest.size == self.url.size
+            logging.info(f"Size on server: {self.url.size}; downloaded size: {self.dest.size}")  # noqa: E501
             logging.debug(f"Same size: {result}")
         if result and sum_type == 'md5':
+            logging.info(f"MD5 on server: {self.url.md5}; downloaded MD5: {self.dest.md5}")  # noqa: E501
             result = self.dest.md5 == self.url.md5
             logging.debug(f"Same MD5: {result}")
         return result
