@@ -6,6 +6,7 @@ import sys
 import threading
 from os import getcwd
 from pathlib import Path
+from queue import Empty
 from queue import Queue
 from time import sleep
 from urllib.parse import unquote
@@ -154,7 +155,10 @@ class Download:
         # Show download progress.
         while t.is_alive():
             if use_own_queue:
-                p = self.progress_queue.get(timeout=10)
+                try:
+                    p = self.progress_queue.get(timeout=10)
+                except Empty:
+                    continue  # checks to see if thread is still alive
                 self._write_progress_bar(p)
             else:
                 sleep(0.1)
