@@ -128,10 +128,8 @@ Run code:
 ```
 demo$ python -c 'import tkapp; tkapp.run()'
 ```
-||
-|:-:|
-|[![tkapp.py](https://raw.githubusercontent.com/sil-car/net-dl/main/demo/tkapp.png)](https://raw.githubusercontent.com/sil-car/net-dl/main/demo/tkapp.mp4)|
 
+https://github.com/user-attachments/assets/a33d7752-3167-4224-a7ce-4fb56f69fe5d
 
 ## Releasing on PyPI
 
