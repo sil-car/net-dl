@@ -130,7 +130,7 @@ demo$ python -c 'import tkapp; tkapp.run()'
 ```
 ||
 |:-:|
-|![](demo/tkapp.mp4)|
+|![](https://raw.githubusercontent.com/sil-car/net-dl/branch/demo/tkapp.mp4)|
 
 
 ## Releasing on PyPI
