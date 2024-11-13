@@ -7,7 +7,7 @@ name = "net-dl"
 description = "Download web pages and files from the internet using CLI or as a Python module."
 readme = "README.md"
 authors = [
-    {name="Nate Marti", email="n8marti@gmail.com"}
+    {name="Nate Marti", email="nate_marti@sil.org"}
 ]
 requires-python = ">=3.8"
 dependencies = [
@@ -21,8 +21,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://gitlab.com/n8marti/net-dl"
-Issues = "https://gitlab.com/n8marti/net-dl/-/issues"
+Homepage = "https://github.com/sil-car/net-dl"
+Issues = "https://github.com/sil-car/net-dl/issues"
 
 [project.scripts]
 net-dl = "net_dl:main"

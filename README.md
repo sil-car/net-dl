@@ -3,7 +3,7 @@
 Download web pages and files from the internet. Can be used as a standalone
 CLI command, or as a python module.
 
-[Project README](https://gitlab.com/n8marti/net-dl/-/blob/main/README.md)
+[Project README](https://github.com/sil-car/net-dl/blob/main/README.md)
 
 ## Installation
 
