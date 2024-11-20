@@ -8,7 +8,7 @@ from sys import stderr
 from . import config
 from .download import Download
 
-__version__ = '0.1.5'
+__version__ = '0.2.0'
 
 
 def main():
