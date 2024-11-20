@@ -1,5 +1,4 @@
 import logging
-import re
 import requests
 import shutil
 import sys
@@ -50,17 +49,23 @@ class Download:
         self.callback_kwargs = callback_kwargs
 
     def get(self):
-        self.url.get_head_response()
-        r = self.url.head_response
-        if r is None:
+        self.url._ensure_head_response()
+        if self.url.head_response is None:
+            logging.error(f"No header response from \"{self.url}\"")
             return 1
-        if r.status_code != 200:
-            if r.status_code == 404:
-                logging.error(f"{r.status_code}: {r.reason}")
+        if self.url.head_response.status_code != 200:
+            if self.url.head_response.status_code == 404:
+                logging.error(
+                    f"{self.url.head_response.status_code}: "
+                    f"{self.url.head_response.reason}"
+                )
                 return 1
             else:
                 logging.debug(self.url.head_response.__dict__)
-                logging.error(f"{r.status_code}: {r.reason}")
+                logging.error(
+                    f"{self.url.head_response.status_code}: "
+                    f"{self.url.head_response.reason}"
+                )
                 return 1
         if self.chunk_size is None:
             # Ensure at least 2 chunks so that progress queue doesn't hang.
@@ -91,10 +96,9 @@ class Download:
             use_own_queue = False
 
         # Determine output filename.
-        cd_str = self.url.head_response.headers.get('Content-Disposition')
-        if cd_str:
-            filename = self._get_content_disposition_filename(cd_str)
-        else:  # get from URL
+        # TODO: Make filename an attribute of the Url object.
+        filename = self.url._get_content_disposition_filename()
+        if filename is None:  # get from URL
             filename = unquote(self.url.final_url.split('/')[-1])
         self.dest = LocalFile(self.destdir / filename)
         logging.debug(f"{str(self.dest)=}")
@@ -218,33 +222,6 @@ class Download:
                 logging.error(f"{type(e)}: {e}")
                 return
         return r
-
-    def _get_content_disposition_filename(self, cd_header_str):
-        """
-        'Content-Disposition':
-        'attachment;
-        filename="=?UTF-8?Q?avast=5Ffree=5Fantivirus=5Foffline=5Fsetup.exe?=";
-        filename*=UTF-8\'\'avast_free_antivirus_offline_setup.exe'
-        """
-        fname = re.findall(
-            r"filename\*=([^;]+)",
-            cd_header_str,
-            flags=re.IGNORECASE
-        )
-        if not fname:
-            fname = re.findall(
-                r"filename=([^;]+)",
-                cd_header_str,
-                flags=re.IGNORECASE
-            )
-        if fname[0].lower().startswith("utf-8''"):
-            fname = re.sub(r"utf-8''", '', fname[0], flags=re.IGNORECASE)
-            fname = unquote(fname)
-        else:
-            fname = fname[0]
-
-        # Remove space and double quotes.
-        return fname.strip().strip('"')
 
     def _get_stream_request(self, file_mode='wb'):
         logging.debug(f"Download._get_stream_request for: {self.url}")
