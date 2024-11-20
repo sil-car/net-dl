@@ -10,7 +10,7 @@ class TestProps(unittest.TestCase):
         self.p = src.net_dl.props.Props(__file__)
 
     def test_uri(self):
-        print(self.p.path)
+        # print(self.p.path)
         assert self.p.path == __file__
 
 
@@ -41,21 +41,51 @@ class TestLocalFile(unittest.TestCase):
 
 
 class TestUrl(unittest.TestCase):
-    def setUp(self):
-        self.url = 'https://ip.me'
-        self.p = src.net_dl.props.Url(self.url)
-        # NOTE: This will make a connection to the URL and be a bit slow.
-        self.p.get_head_response()
-
     def test_init(self):
+        url = 'https://ip.me'
+        orl_obj = src.net_dl.props.Url(url)
+        # NOTE: This will make a connection to the URL and be a bit slow.
+        orl_obj.get_head_response()
         self.assertTrue(
             isinstance(
-                self.p.head_response.headers,
+                orl_obj.head_response.headers,
                 requests.structures.CaseInsensitiveDict
             )
         )
         self.assertEqual(
-            self.p.head_response.headers.get('Content-Type'),
+            orl_obj.head_response.headers.get('Content-Type'),
             'text/plain; charset=utf-8'
         )
         # TODO: Pick a different link to test MD5?
+
+    def test_is_file(self):
+        urls = {
+            'https://httpbin.org/html': False,
+            'https://httpbin.org/image/svg': True,
+            'https://httpbin.org/json': False,
+            'https://httpbin.org/robots.txt': False,
+            'https://httpbin.org/xml': False,
+        }
+        for url, result in urls.items():
+            url_obj = src.net_dl.props.Url(url)
+            url_obj._set_is_file(url_obj.get_head_response().headers)
+            self.assertIs(
+                url_obj.is_file,
+                result,
+                f"{url}: {result}; {url_obj.is_file}"
+            )
+
+
+class TestContentDispositionName(unittest.TestCase):
+    def test_dropbox(self):
+        url = 'https://www.dropbox.com/scl/fo/x88k1o9wkcjqwut4zxtrv/AJRI10SuMponk_W3FNzo6Hc?rlkey=vawj53no9kqomavll1vncan8v&e=1&st=wkgzl7sj&dl=1'  # noqa: E501
+        dropbox_url = src.net_dl.props.Url(url)
+        self.assertEqual(
+            dropbox_url._get_content_disposition_filename(),
+            'Banda-Bambari(Linda) Discrepancies & Corrections.zip'
+        )
+
+    def test_none(self):
+        url = 'https://httpbin.org/html'
+        none_url = src.net_dl.props.Url(url)
+        self.assertIsNone(none_url._get_content_disposition_filename())
