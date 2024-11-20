@@ -10,8 +10,7 @@ class TestProps(unittest.TestCase):
         self.p = src.net_dl.props.Props(__file__)
 
     def test_uri(self):
-        # print(self.p.path)
-        assert self.p.path == __file__
+        self.assertEqual(self.p.path, __file__)
 
 
 class TestLocalFile(unittest.TestCase):
@@ -41,11 +40,11 @@ class TestLocalFile(unittest.TestCase):
 
 
 class TestUrl(unittest.TestCase):
-    def test_init(self):
+    def test__ensure_head_response(self):
         url = 'https://ip.me'
         orl_obj = src.net_dl.props.Url(url)
         # NOTE: This will make a connection to the URL and be a bit slow.
-        orl_obj.get_head_response()
+        orl_obj._ensure_head_response()
         self.assertTrue(
             isinstance(
                 orl_obj.head_response.headers,
@@ -58,7 +57,7 @@ class TestUrl(unittest.TestCase):
         )
         # TODO: Pick a different link to test MD5?
 
-    def test_is_file(self):
+    def test__is_file(self):
         urls = {
             'https://httpbin.org/html': False,
             'https://httpbin.org/image/svg': True,
@@ -68,7 +67,7 @@ class TestUrl(unittest.TestCase):
         }
         for url, result in urls.items():
             url_obj = src.net_dl.props.Url(url)
-            url_obj._set_is_file(url_obj.get_head_response().headers)
+            url_obj._set_is_file()
             self.assertIs(
                 url_obj.is_file,
                 result,
@@ -78,6 +77,7 @@ class TestUrl(unittest.TestCase):
 
 class TestContentDispositionName(unittest.TestCase):
     def test_dropbox(self):
+        # TODO: Find a more permanent URL?
         url = 'https://www.dropbox.com/scl/fo/x88k1o9wkcjqwut4zxtrv/AJRI10SuMponk_W3FNzo6Hc?rlkey=vawj53no9kqomavll1vncan8v&e=1&st=wkgzl7sj&dl=1'  # noqa: E501
         dropbox_url = src.net_dl.props.Url(url)
         self.assertEqual(
