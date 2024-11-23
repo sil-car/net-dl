@@ -1,0 +1,71 @@
+net_dl.download
+===============
+
+.. py:module:: net_dl.download
+
+.. autoapi-nested-parse::
+
+   Contains the Download class
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   net_dl.download.Download
+
+
+Module Contents
+---------------
+
+.. py:class:: Download(url=None, destdir=getcwd(), destname=None, request_headers=None, chunk_size=None, progress_queue=None, remove_on_error=True, resume=None, timeout=config.HTTP_TIMEOUT, callback=None, callback_args=list(), callback_kwargs=dict())
+
+   The download task object.
+
+   It contains the source URL, the destination folder, and other needed
+   attributes.
+
+   :ivar url: the source URL to download from
+   :ivar destdir: the local destination folder
+   :ivar resume: attempt to resume an incomplete download
+
+
+   .. py:method:: get()
+
+      The typical way to start the download task.
+
+      Whether the URL is downloaded as a file or it's content is printed to
+      stdout depends on the value of 'Content-Type' in the URL's response
+      headers.
+
+
+
+   .. py:method:: get_content()
+
+      Explicitly download the URL's content, regardless of 'Content-Type'.
+              
+
+
+
+   .. py:method:: get_text()
+
+      Explicitly download the URL's text content.
+
+      This method is automatically used if Content-Type is "text-like".
+
+
+
+   .. py:method:: get_file(file_mode='wb')
+
+      Explicitly download the URL as a file.
+
+      This method is automatically used if Content-Type is
+      "application-like"; progress bar is shown.
+
+      :ivar file_mode: write mode for downloaded file. 'ab' is used to
+          continue a partial download
+
+
+

@@ -1,0 +1,23 @@
+net_dl
+======
+
+.. py:module:: net_dl
+
+.. autoapi-nested-parse::
+
+   Download from a given URL, similar to wget or curl.
+
+   Whether the URL is downloaded as a file or it's content is printed to stdout
+   depends on the value of 'Content-Type' in the URL's response headers.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/net_dl/download/index
+
+
