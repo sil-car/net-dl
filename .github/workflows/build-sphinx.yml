@@ -15,7 +15,7 @@ jobs:
     - name: Build HTML
       uses: ammaraskar/sphinx-action@6.1.0
       with:
-        pre-build-command: "python3 -m pip --upgrade install .[docs]"
+        pre-build-command: "python3 -m pip install --upgrade pip .[docs]"
         build-command: "sphinx-build -b html ./source ./build"
         docs-folder: "sphinx/"
 
