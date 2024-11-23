@@ -15,7 +15,7 @@ from . import config
 from .download import Download
 
 __all__ = ('Download')
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 def main():
