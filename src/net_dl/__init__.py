@@ -1,3 +1,9 @@
+"""Download from a given URL, similar to wget or curl.
+
+Whether the URL is downloaded as a file or it's content is printed to stdout
+depends on the value of 'Content-Type' in the URL's response headers.
+"""
+
 import argparse
 import logging
 from pathlib import Path
@@ -8,6 +14,7 @@ from sys import stderr
 from . import config
 from .download import Download
 
+__all__ = ('Download')
 __version__ = '0.2.0'
 
 

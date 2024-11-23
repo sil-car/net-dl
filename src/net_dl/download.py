@@ -1,3 +1,5 @@
+"""Contains the Download class"""
+
 import logging
 import requests
 import shutil
@@ -16,6 +18,15 @@ from .props import Url
 
 
 class Download:
+    """The download task object.
+
+    It contains the source URL, the destination folder, and other needed
+    attributes.
+
+    :ivar url: the source URL to download from
+    :ivar destdir: the local destination folder
+    :ivar resume: attempt to resume an incomplete download
+    """
     def __init__(
         self,
         url=None,
@@ -49,6 +60,12 @@ class Download:
         self.callback_kwargs = callback_kwargs
 
     def get(self):
+        """The typical way to start the download task.
+
+        Whether the URL is downloaded as a file or it's content is printed to
+        stdout depends on the value of 'Content-Type' in the URL's response
+        headers.
+        """
         self.url._ensure_head_response()
         if self.url.head_response is None:
             logging.error(f"No header response from \"{self.url}\"")
@@ -77,17 +94,28 @@ class Download:
         return 0
 
     def get_content(self):
+        """Explicitly download the URL's content, regardless of 'Content-Type'.
+        """
         return self._get_completed_request_obj()._content
 
     def get_text(self):
-        ''' Content-Type is "text", etc., return decoded text. '''
+        """Explicitly download the URL's text content.
+
+        This method is automatically used if Content-Type is "text-like".
+        """
         r = self._get_completed_request_obj()
         if r:
             print(r.text)
 
     def get_file(self, file_mode='wb'):
-        ''' Content-Type is "application", show progress and save to file. '''
+        """Explicitly download the URL as a file.
 
+        This method is automatically used if Content-Type is
+        "application-like"; progress bar is shown.
+
+        :ivar file_mode: write mode for downloaded file. 'ab' is used to
+            continue a partial download
+        """
         # Determine progress queue.
         if self.progress_queue is None:
             use_own_queue = True

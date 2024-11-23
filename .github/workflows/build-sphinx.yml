@@ -1,0 +1,33 @@
+name: build sphinx docs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build HTML
+      uses: ammaraskar/sphinx-action@master
+      with:
+        build-command: "sphinx-build -b html ./source ./build"
+        docs-folder: "sphinx/"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        path: sphinx/build
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: "./sphinx/build/"
+

@@ -20,6 +20,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-autoapi",
+]
+
 [project.urls]
 Homepage = "https://github.com/sil-car/net-dl"
 Issues = "https://github.com/sil-car/net-dl/issues"
