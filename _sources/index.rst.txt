@@ -59,6 +59,8 @@ INFO:root:File already exists: /home/nate/g/net-dl/svg
 0
 >>>
 
+See how to incorporate an external progress bar in the `GitHub README <https://github.com/sil-car/net-dl/blob/main/README.md>`_.
+
 The ``Download`` class
 ----------------------
 
