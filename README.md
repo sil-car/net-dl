@@ -3,7 +3,7 @@
 Download web pages and files from the internet. Can be used as a standalone
 CLI command, or as a python module.
 
-[Project README](https://github.com/sil-car/net-dl/blob/main/README.md)
+[Usage & Documentation](https://sil-car.github.io/net-dl/)
 
 ## Installation
 
@@ -18,58 +18,7 @@ pipx install net-dl
 python3 -m pip install net-dl
 ```
 
-## Usage
-
-### CLI command
-```
-~$ # print content to stdout if text/html/json/xml
-~$ net-dl 'https://httpbin.org/json'
-{
-  "slideshow": {
-    "author": "Yours Truly", 
-    "date": "date of publication", 
-    "slides": [
-      {
-        "title": "Wake up to WonderWidgets!", 
-        "type": "all"
-      }, 
-      {
-        "items": [
-          "Why <em>WonderWidgets</em> are great", 
-          "Who <em>buys</em> WonderWidgets"
-        ], 
-        "title": "Overview", 
-        "type": "all"
-      }
-    ], 
-    "title": "Sample Slide Show"
-  }
-}
-
-~$ # save content to disk if file
-~$ net-dl 'https://httpbin.org/image/svg'
- [...................................                                     ]  50%
-```
-
-### Python module
-
-**Built-in progress bar**
-```python
->>> import net_dl
->>> url = 'https://httpbin.org/image/svg'
->>> dl = net_dl.Download(url)
->>> dl.get()
- [........................................................................] 100%
-0
->>> import logging
->>> l = logging.get_logger()
->>> l.setLevel(logging.INFO)
->>> dl.get()
-INFO:root:File already exists: /home/nate/g/net-dl/svg
-0
->>>
-```
-**External progress bar**  
+## External progress bar example
 `demo/tkapp.py`:
 ```python
 from net_dl import Download

@@ -27,7 +27,7 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sil-car/net-dl"
+Homepage = "https://sil-car.github.io/net-dl/"
 Issues = "https://github.com/sil-car/net-dl/issues"
 
 [project.scripts]
