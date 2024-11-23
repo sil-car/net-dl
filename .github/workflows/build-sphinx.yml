@@ -15,6 +15,7 @@ jobs:
     - name: Build HTML
       uses: ammaraskar/sphinx-action@master
       with:
+        pre-build-command: "python3 -m pip install .[docs]"
         build-command: "sphinx-build -b html ./source ./build"
         docs-folder: "sphinx/"
 
