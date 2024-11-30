@@ -86,7 +86,10 @@ class Download:
                 return 1
         if self.chunk_size is None:
             # Ensure at least 2 chunks so that progress queue doesn't hang.
-            self.chunk_size = min(round(self.url.size / 2), 100*1024)
+            if self.url.size is None:
+                self.chunk_size = 100*1024
+            else:
+                self.chunk_size = min(round(self.url.size / 2), 100*1024)
         if self.url.is_file:
             self.get_file()
         else:
