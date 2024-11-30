@@ -30,6 +30,17 @@ class TestDownload(unittest.TestCase):
         dest = Path(url.split('/')[-1])
         d = download.Download(url)
         d.get()
+        self.assertTrue(dest.is_file())
         self.assertEqual(d.url.size, dest.stat().st_size)
+        if dest.is_file():
+            dest.unlink()
+
+    def test_file_no_size(self):
+        url = 'https://gitlab.com/acatbadmin/desktops/-/archive/master/desktops-master.tar.gz'  # noqa: E501
+        dest = Path('desktops-master.tar.gz')
+        d = download.Download(url)
+        self.assertIsNone(d.url.size)
+        d.get()
+        self.assertTrue(dest.is_file())
         if dest.is_file():
             dest.unlink()

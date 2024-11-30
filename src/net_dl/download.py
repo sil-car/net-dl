@@ -87,7 +87,7 @@ class Download:
         if self.chunk_size is None:
             # Ensure at least 2 chunks so that progress queue doesn't hang.
             if self.url.size is None:
-                self.chunk_size = 100*1024
+                self.chunk_size = 10*1024  # fallback, small value
             else:
                 self.chunk_size = min(round(self.url.size / 2), 100*1024)
         if self.url.is_file:
@@ -135,7 +135,11 @@ class Download:
         logging.debug(f"{str(self.dest)=}")
 
         # If file exists try to resume download.
-        self.remaining_size = self.url.size
+        if self.url.size:
+            self.remaining_size = self.url.size
+        else:
+            self.resume = False  # can't resume if filesize is unknown
+            self.remaining_size = 0
         if self.dest.path.is_file():
             logging.debug(f"Destination file exists: {self.dest.path}")
             local_size = self.dest.get_size()
@@ -153,7 +157,7 @@ class Download:
                     self.request_headers['Range'] = f'bytes={local_size}-{self.url.size}'  # noqa: E501
                 else:
                     self.requeset_headers['Range'] = f'bytes={local_size}-'
-            elif local_size == self.url.size:
+            elif self.url.size and local_size == self.url.size:
                 logging.debug("File already downloaded. Verifying integrity.")
                 sum_type = None
                 if self.url.md5:
@@ -164,7 +168,10 @@ class Download:
                 else:
                     logging.debug("Redownloading file.")
             else:
-                logging.debug("Local file size mismatch; restarting download.")
+                if self.url.size:
+                    logging.debug("Local file size mismatch; restarting download.")  # noqa: E501
+                else:
+                    logging.debug("File size unknown; starting download.")
 
         # Log download type.
         if 'Range' in self.request_headers.keys():
@@ -278,7 +285,11 @@ class Download:
                         f.write(chunk)
                         # Send progress value to queue param.
                         local_size = self.dest.get_size()
-                        percent = round(local_size / self.url.size * 100)
+                        if self.url.size:
+                            size = self.url.size
+                        else:
+                            size = local_size  # fallback shows 100%
+                        percent = round(local_size / size * 100)
                         self.progress_queue.put(percent)
                         if self.callback:
                             self.callback(
