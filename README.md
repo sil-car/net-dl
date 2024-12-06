@@ -84,3 +84,7 @@ https://github.com/user-attachments/assets/a33d7752-3167-4224-a7ce-4fb56f69fe5d
 
 - Create new tag in repo that matches package version; e.g. if version is "0.1.0", tag will be "v0.1.0".
 - CI will auto build and upload package to TestPyPI and PyPI.
+
+## ToDo
+
+- Build in an override for whether the file is downloaded or printed to stdout. This would be useful for scripts, for example, that would be recognized as text and printed rather than downloaded. Maybe not so useful, however, to print content that would otherwise be downloaded?
